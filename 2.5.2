@@ -1,0 +1,51 @@
+RACK >
+> A Node is simply a computer. This is typically non-enterprise, commodity hardware for 
+nodes that contain data. Storage of Nodes is called as rack. A rack is a collection 
+of 30 or 40 nodes that are physically stored close together and are all connected to
+the same network switch. Network bandwidth between any two nodes in rack is greater
+than bandwidth between two nodes on different racks.A Hadoop Cluster is a collection of racks.
+
+> Hadoop clusters are often referred to as "shared nothing" systems because the only 
+thing that is shared between nodes is the network that connects them. 
+Large Hadoop Clusters are arranged in several racks.Network traffic between different 
+nodes in the same rack is much more desirable than network traffic across the racks. 
+Rack  is having the knowledge of Cluster topology or more specifically how the 
+different data nodes are distributed across the racks of a Hadoop cluster. The 
+importance of this knowledge relies on this assumption that collocated  data nodes 
+inside a specific rack will have more bandwidth and less latency  whereas two data 
+nodes in separate racks will have comparatively less bandwidth  and higher latency.
+
+The main purpose of Rack is:
+>Increasing the availability of data block
+>Better cluster performance
+
+
+The rack arrangement in a hadoop cluster>
+
+For small clusters in which all servers are connected by a single switch, there are only
+two levels of locality: “on-machine” and “off-machine.” When loading data from a DataNode’s
+local drive into HDFS, the NameNode will schedule one copy to go into the local DataNode,
+and will pick two other machines at random from the cluster.
+
+For larger Hadoop installations which span multiple racks, it is important to ensure that
+replicas of data exist on multiple racks. This way, the loss of a switch does not render 
+portions of the data unavailable due to all replicas being underneath it.
+HDFS can be made rack-aware by the use of a script which allows the master node to map the
+network topology of the cluster. While alternate configuration strategies can be used, the
+default implementation allows you to provide an executable script which returns the “rack 
+address” of each of a list of IP addresses.
+
+The network topology script receives as arguments one or more IP addresses of nodes in the
+cluster. It returns on stdout a list of rack names, one for each input. The input and output
+order must be consistent.
+
+To set the rack mapping script, specify the key topology.script.file.name in conf/hadoop-site.xml.
+This provides a command to run to return a rack id; it must be an executable script or program. 
+By default, Hadoop will attempt to send a set of IP addresses to the file as several separate 
+command line arguments. You can control the maximum acceptable number of arguments with the topology.
+script.number.args key.
+
+Rack ids in Hadoop are hierarchical and look like path names. By default, every node has a rack id 
+of /default-rack. You can set rack ids for nodes to any arbitrary path, e.g., /foo/bar-rack. Path 
+elements further to the left are higher up the tree. Thus a reasonable structure for a large 
+installation may be /top-switch-name/rack-name.
